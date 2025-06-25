@@ -69,4 +69,22 @@ class UserController extends Controller
     {
         //
     }
+
+    public function emailValidate(Request $request)
+    {
+        $user = User::where('email', $request->email)
+        ->where('email_verification_code', $request->code)
+        ->first();
+            
+        if ($user) {
+            if ($user['email_verified_at'] !== null) {
+                return response()->json(['message' => 'Email already verified!'], 400);
+            } else {
+                $user->update(['email_verified_at' => now()]);
+                return response()->json(['message' => 'Email verified successfully!']);
+            }
+        }
+        
+        return response()->json(['message' => 'Invalid verification code or email!'], 400);
+    }
 }
